@@ -47,6 +47,12 @@ export default function LoginPage({
       const current = await getCurrentUser()
       if (!current.user) throw new Error('Unable to load user profile')
 
+      if (role === 'admin' && current.user.role !== 'admin') {
+        await supabase.auth.signOut()
+        setUser(null)
+        throw new Error('This account does not have admin access.')
+      }
+
       setUser(current.user)
       if (current.user.role === 'admin') router.push('/admin')
       else router.push(returnUrl)
