@@ -2,14 +2,20 @@ import { createAuthClient, supabaseAdmin } from '@/lib/supabase-server'
 import type { User } from '@/lib/types'
 
 export async function getCurrentUser(): Promise<{ user: User | null }> {
-  const supabase = await createAuthClient()
+  let supabase
+  try {
+    supabase = await createAuthClient()
+  } catch (err) {
+    // Stale/missing refresh token or corrupt session cookie — treat as not signed in.
+    return { user: null }
+  }
 
   let user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> } | null = null
   try {
     const { data } = await supabase.auth.getUser()
     user = data.user
   } catch (err) {
-    // Stale/missing refresh token or expired session cookie — treat as not signed in.
+    // Supabase threw while validating/refreshing the session — treat as not signed in.
     return { user: null }
   }
 
