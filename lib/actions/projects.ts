@@ -204,7 +204,7 @@ export async function getStudentStats() {
 
   const { data: uploads, error: uploadsError } = await supabaseAdmin
     .from('projects')
-    .select('downloadCount')
+    .select('downloadCount, status, uploadDate')
     .eq('uploaderId', user.userId)
 
   if (uploadsError) throw new Error(uploadsError.message)
@@ -220,7 +220,14 @@ export async function getStudentStats() {
   const totalDownloads = (uploads || []).reduce((sum, p) => sum + ((p as Project).downloadCount || 0), 0)
   const totalBookmarks = bookmarksCount || 0
 
-  return { totalUploads, totalDownloads, totalBookmarks }
+  const pendingApprovals = (uploads || []).filter((p) => (p as Project).status === 'Pending').length
+
+  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const uploadsThisWeek = (uploads || []).filter(
+    (p) => (p as Project).uploadDate >= oneWeekAgo
+  ).length
+
+  return { totalUploads, totalDownloads, totalBookmarks, pendingApprovals, uploadsThisWeek }
 }
 
 export async function uploadProject(formData: FormData) {
@@ -379,7 +386,7 @@ export async function deleteProject(projectId: string) {
 export async function getRepositoryStats() {
   const { data, error } = await supabaseAdmin
     .from('projects')
-    .select('department, downloadCount')
+    .select('department, downloadCount, uploadDate')
     .eq('status', 'Approved')
 
   if (error) throw new Error(error.message)
@@ -389,12 +396,15 @@ export async function getRepositoryStats() {
   const departmentCount = new Set(projects.map((p) => p.department)).size
   const downloadCount = projects.reduce((sum, p) => sum + (p.downloadCount || 0), 0)
 
+  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const projectsThisWeek = projects.filter((p) => p.uploadDate >= oneWeekAgo).length
+
   const departmentCounts: Record<string, number> = {}
   projects.forEach((p) => {
     departmentCounts[p.department] = (departmentCounts[p.department] || 0) + 1
   })
 
-  return { projectCount, departmentCount, downloadCount, departmentCounts }
+  return { projectCount, departmentCount, downloadCount, departmentCounts, projectsThisWeek }
 }
 
 export async function getProjectStats() {

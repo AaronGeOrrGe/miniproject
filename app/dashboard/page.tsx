@@ -16,6 +16,7 @@ export default async function DashboardPage() {
       departmentCount: 0,
       downloadCount: 0,
       departmentCounts: {},
+      projectsThisWeek: 0,
     })),
   ])
 
@@ -45,9 +46,18 @@ export default async function DashboardPage() {
           icon={FileText}
           label="Repository Total"
           value={globalStats.projectCount.toLocaleString()}
-          sub="+12 this week"
+          sub={globalStats.projectsThisWeek > 0 ? `+${globalStats.projectsThisWeek} this week` : 'No new projects this week'}
         />
-        <StatCard icon={Upload} label="My Uploads" value={stats.totalUploads} sub="2 pending approval" />
+        <StatCard
+          icon={Upload}
+          label="My Uploads"
+          value={stats.totalUploads}
+          sub={
+            stats.pendingApprovals > 0
+              ? `${stats.pendingApprovals} pending approval${stats.pendingApprovals === 1 ? '' : 's'}`
+              : 'No pending approvals'
+          }
+        />
         <StatCard icon={Bookmark} label="Bookmarks" value={stats.totalBookmarks} sub="Saved for later" />
         <StatCard icon={Download} label="Recent Downloads" value={stats.totalDownloads} sub="Last 30 days" />
       </div>
