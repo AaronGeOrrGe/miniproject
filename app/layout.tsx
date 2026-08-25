@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/AuthProvider";
+import { PWAProvider } from "@/components/PWAProvider";
 import { Header } from "@/components/Header";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -20,6 +21,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Students Academic Repository",
   description: "Cloud-based student project repository and retrieval system",
+  manifest: "/manifest.json",
+  themeColor: "#2563eb",
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    apple: "/icons/icon-192x192.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "SAR",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export default async function RootLayout({
@@ -39,6 +51,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider initialTheme={theme === "dark" ? "dark" : "light"}>
           <AuthProvider initialUser={user}>
+            <PWAProvider />
             <Header />
             <main className="flex-1">{children}</main>
           </AuthProvider>
