@@ -3,7 +3,16 @@ import type { User } from '@/lib/types'
 
 export async function getCurrentUser(): Promise<{ user: User | null }> {
   const supabase = await createAuthClient()
-  const { data: { user } } = await supabase.auth.getUser()
+
+  let user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> } | null = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch (err) {
+    // Stale/missing refresh token or expired session cookie — treat as not signed in.
+    return { user: null }
+  }
+
   if (!user) return { user: null }
 
   let { data, error } = await supabaseAdmin
