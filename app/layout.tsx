@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -22,7 +22,6 @@ export const metadata: Metadata = {
   title: "Students Academic Repository",
   description: "Cloud-based student project repository and retrieval system",
   manifest: "/manifest.json",
-  themeColor: "#2563eb",
   icons: {
     icon: "/icons/icon-192x192.png",
     apple: "/icons/icon-192x192.png",
@@ -32,6 +31,10 @@ export const metadata: Metadata = {
     title: "SAR",
     statusBarStyle: "black-translucent",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
 };
 
 export default async function RootLayout({
