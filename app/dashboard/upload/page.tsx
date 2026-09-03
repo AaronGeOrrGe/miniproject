@@ -3,8 +3,9 @@
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Upload, AlertCircle } from 'lucide-react'
-import { uploadProject } from '@/lib/actions/projects'
+import { prepareProjectUpload, uploadProject } from '@/lib/actions/projects'
 import { PROJECT_TYPES, ALL_DEPARTMENTS } from '@/lib/constants'
+import { createClient } from '@/lib/supabase-client'
 
 export default function UploadPage() {
   const router = useRouter()
@@ -30,9 +31,37 @@ export default function UploadPage() {
 
     setLoading(true)
     try {
-      const form = e.currentTarget
-      const formData = new FormData(form)
-      await uploadProject(formData)
+      const formData = new FormData(e.currentTarget)
+      const metadata = {
+        title: String(formData.get('title') || ''),
+        authorName: String(formData.get('authorName') || ''),
+        department: String(formData.get('department') || ''),
+        academicYear: String(formData.get('academicYear') || ''),
+        abstract: String(formData.get('abstract') || ''),
+        projectType: String(formData.get('projectType') || ''),
+        githubUrl: String(formData.get('githubUrl') || ''),
+        liveUrl: String(formData.get('liveUrl') || ''),
+        keywords: String(formData.get('keywords') || ''),
+      }
+      const selectedFiles = [
+        ...(pdfRef.current?.files?.[0] ? [{ kind: 'pdf' as const, file: pdfRef.current.files[0] }] : []),
+        ...(zipRef.current?.files?.[0] ? [{ kind: 'zip' as const, file: zipRef.current.files[0] }] : []),
+        ...Array.from(imagesRef.current?.files || []).map((file) => ({ kind: 'image' as const, file })),
+      ]
+      const descriptors = selectedFiles.map(({ kind, file }) => ({ kind, name: file.name, size: file.size, type: file.type }))
+      const prepared = await prepareProjectUpload(metadata, descriptors)
+      const supabase = createClient()
+
+      for (let index = 0; index < prepared.uploads.length; index++) {
+        const upload = prepared.uploads[index]
+        const file = selectedFiles[index].file
+        const { error: uploadError } = await supabase.storage.from('projects').uploadToSignedUrl(upload.path, upload.token, file, {
+          contentType: file.type || 'application/octet-stream',
+        })
+        if (uploadError) throw new Error(`Failed to upload ${file.name}: ${uploadError.message}. Please submit the form again.`)
+      }
+
+      await uploadProject(prepared.projectId, metadata, descriptors)
       router.push('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')

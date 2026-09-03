@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Students Academic Repository - Site Documentation</title>
+<style>
+  @page { margin: 1in 0.75in; size: A4; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #1e293b;
+    line-height: 1.7;
+    font-size: 11pt;
+    padding: 0 40px;
+  }
+  .cover {
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    text-align: center;
+  }
+  .cover h1 {
+    font-size: 28pt;
+    color: #1e40af;
+    margin-bottom: 10px;
+  }
+  .cover .subtitle {
+    font-size: 16pt;
+    color: #475569;
+    margin-bottom: 30px;
+  }
+  .cover .meta {
+    font-size: 11pt;
+    color: #64748b;
+    line-height: 2;
+  }
+  h1 { font-size: 20pt; color: #1e40af; margin: 30px 0 10px; border-bottom: 2px solid #2563eb; padding-bottom: 6px; }
+  h2 { font-size: 15pt; color: #1e3a8a; margin: 24px 0 8px; }
+  h3 { font-size: 12pt; color: #334155; margin: 18px 0 6px; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0 6px 22px; }
+  li { margin: 3px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 10pt;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f1f5f9;
+    font-weight: 600;
+    color: #1e3a8a;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 9.5pt;
+  }
+  pre {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 9pt;
+    overflow-x: auto;
+    margin: 10px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 9pt;
+    font-weight: 600;
+    margin: 2px 2px;
+  }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-orange { background: #fff7ed; color: #9a3412; }
+  .badge-purple { background: #f3e8ff; color: #6b21a8; }
+  .page-break { page-break-before: always; }
+  .toc a { color: #1e40af; text-decoration: none; }
+  .toc li { margin: 5px 0; }
+  .file-tree { font-family: 'Consolas', monospace; font-size: 9.5pt; line-height: 1.5; }
+  .section-intro { color: #475569; font-style: italic; margin-bottom: 12px; }
+  .highlight-box {
+    background: #eff6ff;
+    border-left: 4px solid #2563eb;
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="cover">
+  <h1>Students Academic Repository</h1>
+  <div class="subtitle">Cloud-Based Student Project Repository &amp; Retrieval System</div>
+  <div style="width:80px;height:4px;background:#2563eb;margin:20px auto;border-radius:2px;"></div>
+  <div class="meta">
+    <strong>Site Documentation</strong><br>
+    Comprehensive overview of functionalities, screens, architecture, and code locations<br><br>
+    <strong>Live URL:</strong> https://miniproject-one-steel.vercel.app/<br>
+    <strong>Technology:</strong> Next.js 16 &middot; React 19 &middot; Supabase &middot; Tailwind CSS 4<br>
+    <strong>Date:</strong> September 2026
+  </div>
+</div>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<h1>Table of Contents</h1>
+<div class="toc">
+<ol>
+  <li><a href="#overview">Project Overview</a></li>
+  <li><a href="#tech-stack">Technology Stack</a></li>
+  <li><a href="#architecture">System Architecture</a></li>
+  <li><a href="#directory">Directory Structure &amp; Code Locations</a></li>
+  <li><a href="#database">Database Schema</a></li>
+  <li><a href="#auth">Authentication &amp; Authorization</a></li>
+  <li><a href="#screens">Screens &amp; Pages</a>
+    <ol type="a">
+      <li>Landing / Home Page</li>
+      <li>Registration Page</li>
+      <li>Login Page</li>
+      <li>Forgot Password</li>
+      <li>Reset Password</li>
+      <li>Student Dashboard</li>
+      <li>Upload Project</li>
+      <li>Upload History</li>
+      <li>Bookmarks</li>
+      <li>Profile Settings</li>
+      <li>Projects Search / Browse</li>
+      <li>Project Detail</li>
+      <li>Admin Dashboard</li>
+      <li>Admin Projects Management</li>
+      <li>Admin Users Management</li>
+      <li>Admin Statistics</li>
+    </ol>
+  </li>
+  <li><a href="#communication">Communication &amp; Data Flow</a></li>
+  <li><a href="#notifications">Notification System</a></li>
+  <li><a href="#file-storage">File Storage &amp; Downloads</a></li>
+  <li><a href="#pwa">PWA (Progressive Web App)</a></li>
+  <li><a href="#security">Security Measures</a></li>
+  <li><a href="#deployment">Deployment</a></li>
+  <li><a href="#components">Shared Components</a></li>
+</ol>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ==================== 1. OVERVIEW ==================== -->
+<h1 id="overview">1. Project Overview</h1>
+<p>The <strong>Students Academic Repository (SAR)</strong> is a cloud-based web application designed to serve as a centralized digital archive for student academic projects. It allows students to upload, manage, and showcase their research work, while administrators review and curate submissions.</p>
+
+<div class="highlight-box">
+  <strong>Key Objectives:</strong>
+  <ul>
+    <li>Provide a secure, searchable repository for student projects across all departments</li>
+    <li>Allow students to upload project reports (PDF), source code (ZIP), GitHub links, live URLs, and images</li>
+    <li>Implement an admin-reviewed approval workflow before projects are published</li>
+    <li>Enable advanced search by title, author, department, academic year, keywords, and project type</li>
+    <li>Track downloads, views, and provide analytics for administrators</li>
+    <li>Support Progressive Web App (PWA) installation on mobile and desktop</li>
+  </ul>
+</div>
+
+<h2>User Roles</h2>
+<table>
+  <tr><th>Role</th><th>Capabilities</th></tr>
+  <tr>
+    <td><span class="badge">Student</span></td>
+    <td>Register, login, upload projects, search/browse approved projects, download files, bookmark projects, mark projects as helpful, view profile, view notifications</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-purple">Admin</span></td>
+    <td>All student capabilities + approve/reject projects, view all projects (any status), manage users (search, deactivate), view platform statistics with charts, delete projects</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-orange">Guest</span></td>
+    <td>View the landing page (locked project preview), register an account. Cannot search, browse, or download projects.</td>
+  </tr>
+</table>
+
+<!-- ==================== 2. TECH STACK ==================== -->
+<h1 id="tech-stack">2. Technology Stack</h1>
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+  <tr><td>Frontend Framework</td><td>Next.js (App Router)</td><td>16.3.0</td><td>Full-stack React framework with server-side rendering, routing, API routes</td></tr>
+  <tr><td>UI Library</td><td>React</td><td>19.2.8</td><td>Component-based user interface</td></tr>
+  <tr><td>Styling</td><td>Tailwind CSS</td><td>4.x</td><td>Utility-first CSS with dark mode support</td></tr>
+  <tr><td>Icons</td><td>Lucide React</td><td>1.28.0</td><td>Modern SVG icon library</td></tr>
+  <tr><td>Charts</td><td>Recharts</td><td>3.10.1</td><td>Bar charts for admin statistics</td></tr>
+  <tr><td>Database</td><td>Supabase (PostgreSQL)</td><td>--</td><td>Cloud database with Row Level Security</td></tr>
+  <tr><td>Authentication</td><td>Supabase Auth</td><td>--</td><td>Email/password auth with email confirmation</td></tr>
+  <tr><td>File Storage</td><td>Supabase Storage</td><td>--</td><td>Private bucket for PDFs, ZIPs, images</td></tr>
+  <tr><td>Server SDK</td><td>@supabase/ssr + @supabase/supabase-js</td><td>0.12.4 / 2.112.0</td><td>Server-side Supabase client with cookie-based auth</td></tr>
+  <tr><td>Language</td><td>TypeScript</td><td>5.x</td><td>Type-safe JavaScript</td></tr>
+  <tr><td>Hosting</td><td>Vercel</td><td>--</td><td>Serverless deployment, CDN, edge functions</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- ==================== 3. ARCHITECTURE ==================== -->
+<h1 id="architecture">3. System Architecture</h1>
+<p class="section-intro">The application follows a modern full-stack architecture using Next.js App Router with Server Components, Server Actions, and API Routes.</p>
+
+<h2>Architecture Diagram (Logical)</h2>
+<pre>
++---------------------------+
+|       User's Browser      |
+|  (React Client Components |
+|   + Service Worker / PWA) |
++------------+--------------+
+             |
+             | HTTPS
+             v
++---------------------------+
+|      Vercel Edge / CDN    |
+|   (Next.js 16 App Router) |
++--+----------+----------+--+
+   |          |          |
+   v          v          v
+Server     Server     API
+Components Actions    Routes
+   |          |          |
+   +----+-----+----+-----+
+        |          |
+        v          v
+  +-----------+  +-----------+
+  | Supabase  |  | Supabase  |
+  | Auth      |  | Database  |
+  | (JWT/     |  | (Postgres)|
+  |  Cookies) |  |           |
+  +-----------+  +-----+-----+
+                       |
+                       v
+                 +-----------+
+                 | Supabase  |
+                 | Storage   |
+                 | (S3-like) |
+                 +-----------+
+</pre>
+
+<h2>Data Flow Summary</h2>
+<ol>
+  <li><strong>Authentication:</strong> Supabase Auth issues JWTs stored in HTTP-only cookies via <code>@supabase/ssr</code>. Server Components read cookies to identify the current user.</li>
+  <li><strong>Server Components:</strong> Pages like the Home, Dashboard, and Bookmarks render on the server, directly querying Supabase via the service-role admin client.</li>
+  <li><strong>Server Actions:</strong> Mutations (upload, approve, delete, bookmark, etc.) use <code>'use server'</code> functions in <code>lib/actions/</code>. These run server-side and are called from Client Components.</li>
+  <li><strong>API Routes:</strong> The download endpoint (<code>/api/download/[id]</code>) generates signed URLs for private files and redirects the browser.</li>
+  <li><strong>Client Components:</strong> Interactive pages (search, admin panels, profile) use <code>'use client'</code> with <code>useState</code>/<code>useEffect</code> and call Server Actions for data.</li>
+</ol>
+
+<div class="page-break"></div>
+
+<!-- ==================== 4. DIRECTORY STRUCTURE ==================== -->
+<h1 id="directory">4. Directory Structure &amp; Code Locations</h1>
+
+<div class="file-tree">
+<pre>
+miniproject/
++-- app/                           # Next.js App Router (pages & layouts)
+|   +-- page.tsx                   # Landing / Home page
+|   +-- layout.tsx                 # Root layout (fonts, theme, auth, PWA, header)
+|   +-- globals.css                # Global styles + Tailwind
+|   +-- loading.tsx                # Root loading skeleton
+|   +-- error.tsx                  # Global error boundary
+|   +-- not-found.tsx              # 404 page
+|   +-- login/page.tsx             # Login screen (student / admin toggle)
+|   +-- register/page.tsx          # Registration screen
+|   +-- forgot-password/page.tsx   # Forgot password screen
+|   +-- reset-password/page.tsx    # Reset password screen
+|   +-- dashboard/                 # Student dashboard area
+|   |   +-- layout.tsx             # Dashboard sidebar layout
+|   |   +-- page.tsx               # Student dashboard home
+|   |   +-- upload/page.tsx        # Upload new project
+|   |   +-- history/page.tsx       # Upload history table
+|   |   +-- bookmarks/page.tsx     # Bookmarked projects
+|   |   +-- profile/page.tsx       # Profile settings
+|   +-- admin/                     # Admin area
+|   |   +-- layout.tsx             # Admin sidebar layout
+|   |   +-- page.tsx               # Admin dashboard (pending queue)
+|   |   +-- projects/page.tsx      # All projects management
+|   |   +-- users/page.tsx         # User management
+|   |   +-- statistics/page.tsx    # Analytics with charts
+|   +-- projects/                  # Public project browsing
+|   |   +-- page.tsx               # Search / filter projects
+|   |   +-- [id]/page.tsx          # Project detail view
+|   +-- api/
+|       +-- download/[id]/route.ts # File download API (signed URLs)
+|       +-- logout/route.ts        # Logout API
+|       +-- session/route.ts       # Session refresh API
++-- components/                    # Shared React components
+|   +-- Header.tsx                 # Global navigation header
+|   +-- DashboardSidebar.tsx       # Sidebar for student/admin dashboards
+|   +-- AuthProvider.tsx           # Auth context (user state, logout)
+|   +-- ThemeProvider.tsx          # Dark/light theme context
+|   +-- PWAProvider.tsx            # PWA service worker registration
+|   +-- ProjectCard.tsx            # Project card (grid view)
+|   +-- ProjectDetailClient.tsx    # Full project detail view
+|   +-- ProjectStatusBadge.tsx     # Status badge (Pending/Approved/Rejected)
+|   +-- ProjectArtifactBadges.tsx  # Artifact badges (PDF/ZIP/GitHub/Live/Images)
+|   +-- NotificationBell.tsx       # Notification bell with unread count
+|   +-- LockedProjectCard.tsx      # Blurred placeholder for guests
+|   +-- UnbookmarkButton.tsx       # Remove bookmark button
+|   +-- GitHubRepoViewer.tsx       # GitHub repository tree viewer
++-- lib/                          # Business logic & utilities
+|   +-- auth.ts                    # getCurrentUser, requireAuth, requireAdmin
+|   +-- types.ts                   # TypeScript type definitions
+|   +-- constants.ts               # Departments, programmes, levels, keywords
+|   +-- supabase-client.ts         # Browser-side Supabase client
+|   +-- supabase-server.ts         # Server-side Supabase clients (admin + auth)
+|   +-- actions/                   # Server Actions
+|       +-- auth.ts                # createUserProfile, updateProfile, listUsers, etc.
+|       +-- projects.ts            # CRUD for projects, bookmarks, downloads, stats
+|       +-- notifications.ts       # Create/read/mark notifications
+|       +-- github.ts              # Fetch GitHub repo tree via API
++-- supabase/                     # Database schemas
+|   +-- schema.sql                 # Main schema (tables, RLS, indexes)
+|   +-- atomic_counters.sql        # Atomic increment RPC functions
+|   +-- project_types_and_media.sql# Schema additions for project types/images
+|   +-- avatars_bucket.sql         # Avatar storage bucket setup
++-- public/                       # Static assets
+|   +-- logo.png                   # Application logo
+|   +-- manifest.json              # PWA manifest
+|   +-- sw.js                      # Service worker
+|   +-- icons/                     # PWA icons (192x192, 512x512)
++-- package.json                  # Dependencies & scripts
++-- next.config.ts                # Next.js configuration
++-- tsconfig.json                 # TypeScript config
+</pre>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ==================== 5. DATABASE ==================== -->
+<h1 id="database">5. Database Schema</h1>
+<p class="section-intro">The database is hosted on Supabase (PostgreSQL). All tables use Row Level Security (RLS). The application uses a service-role key for server-side operations, bypassing RLS. File: <code>supabase/schema.sql</code></p>
+
+<h2>5.1 Users Table</h2>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td><code>userId</code></td><td>UUID (PK)</td><td>References <code>auth.users(id)</code>, cascades on delete</td></tr>
+  <tr><td><code>fullName</code></td><td>TEXT</td><td>User's full legal name</td></tr>
+  <tr><td><code>email</code></td><td>TEXT (unique)</td><td>Email address</td></tr>
+  <tr><td><code>role</code></td><td>TEXT</td><td>'student' or 'admin' (CHECK constraint)</td></tr>
+  <tr><td><code>department</code></td><td>TEXT</td><td>Academic department</td></tr>
+  <tr><td><code>indexNumber</code></td><td>TEXT</td><td>Student index number</td></tr>
+  <tr><td><code>programme</code></td><td>TEXT</td><td>BSc, MSc, PhD, BEng, BTech, MBA</td></tr>
+  <tr><td><code>levelYear</code></td><td>TEXT</td><td>100, 200, 300, 400, 500, 600</td></tr>
+  <tr><td><code>contact</code></td><td>TEXT</td><td>10-digit phone number</td></tr>
+  <tr><td><code>active</code></td><td>BOOLEAN</td><td>Account status (deactivation by admin)</td></tr>
+  <tr><td><code>dateCreated</code></td><td>TIMESTAMPTZ</td><td>Registration timestamp</td></tr>
+</table>
+
+<h2>5.2 Projects Table</h2>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td><code>projectId</code></td><td>UUID (PK)</td><td>Auto-generated project identifier</td></tr>
+  <tr><td><code>title</code></td><td>TEXT</td><td>Project title</td></tr>
+  <tr><td><code>authorName</code></td><td>TEXT</td><td>Author's name</td></tr>
+  <tr><td><code>department</code></td><td>TEXT</td><td>Department the project belongs to</td></tr>
+  <tr><td><code>academicYear</code></td><td>TEXT</td><td>Year of submission (e.g. "2025")</td></tr>
+  <tr><td><code>abstract</code></td><td>TEXT</td><td>Project abstract/description</td></tr>
+  <tr><td><code>keywords</code></td><td>TEXT[]</td><td>Array of keyword tags</td></tr>
+  <tr><td><code>projectType</code></td><td>TEXT</td><td>Research Paper / Software / Website / Design / Other</td></tr>
+  <tr><td><code>pdfUrl / pdfPath</code></td><td>TEXT</td><td>Download API URL and storage path for the PDF</td></tr>
+  <tr><td><code>githubUrl</code></td><td>TEXT</td><td>GitHub repository URL</td></tr>
+  <tr><td><code>sourceCodeZipUrl / sourceCodeZipPath</code></td><td>TEXT</td><td>Download API URL and storage path for the ZIP</td></tr>
+  <tr><td><code>liveUrl</code></td><td>TEXT</td><td>Live/external URL (website, Figma, demo, etc.)</td></tr>
+  <tr><td><code>images</code></td><td>TEXT[]</td><td>Array of storage paths for uploaded images</td></tr>
+  <tr><td><code>status</code></td><td>TEXT</td><td>'Pending', 'Approved', or 'Rejected'</td></tr>
+  <tr><td><code>uploadDate</code></td><td>TIMESTAMPTZ</td><td>When the project was submitted</td></tr>
+  <tr><td><code>downloadCount</code></td><td>INTEGER</td><td>Total downloads (atomic counter)</td></tr>
+  <tr><td><code>viewCount</code></td><td>INTEGER</td><td>Total views (atomic counter, deduplicated by cookie)</td></tr>
+  <tr><td><code>helpfulCount</code></td><td>INTEGER</td><td>Number of "helpful" votes</td></tr>
+  <tr><td><code>helpfulBy</code></td><td>UUID[]</td><td>User IDs who voted helpful</td></tr>
+  <tr><td><code>uploaderId</code></td><td>UUID (FK)</td><td>References <code>users(userId)</code></td></tr>
+</table>
+
+<h2>5.3 Downloads Table</h2>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td><code>downloadId</code></td><td>UUID (PK)</td><td>Auto-generated</td></tr>
+  <tr><td><code>userId</code></td><td>UUID (FK, nullable)</td><td>Who downloaded</td></tr>
+  <tr><td><code>projectId</code></td><td>UUID (FK)</td><td>Which project</td></tr>
+  <tr><td><code>downloadDate</code></td><td>TIMESTAMPTZ</td><td>When</td></tr>
+</table>
+
+<h2>5.4 Bookmarks Table</h2>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td><code>bookmarkId</code></td><td>UUID (PK)</td><td>Auto-generated</td></tr>
+  <tr><td><code>userId</code></td><td>UUID (FK)</td><td>Who bookmarked</td></tr>
+  <tr><td><code>projectId</code></td><td>UUID (FK)</td><td>Which project</td></tr>
+  <tr><td><code>bookmarkDate</code></td><td>TIMESTAMPTZ</td><td>When</td></tr>
+</table>
+<p>A <strong>UNIQUE constraint</strong> on <code>(userId, projectId)</code> ensures a user can bookmark a project only once.</p>
+
+<h2>5.5 Notifications Table</h2>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td><code>notificationId</code></td><td>UUID (PK)</td><td>Auto-generated</td></tr>
+  <tr><td><code>userId</code></td><td>UUID (FK)</td><td>Recipient user</td></tr>
+  <tr><td><code>message</code></td><td>TEXT</td><td>Notification content</td></tr>
+  <tr><td><code>status</code></td><td>TEXT</td><td>'unread' or 'read'</td></tr>
+  <tr><td><code>dateCreated</code></td><td>TIMESTAMPTZ</td><td>Creation timestamp</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- ==================== 6. AUTH ==================== -->
+<h1 id="auth">6. Authentication &amp; Authorization</h1>
+
+<h2>6.1 Authentication Flow</h2>
+<ol>
+  <li><strong>Registration</strong> (<code>app/register/page.tsx</code>): User fills the form, client calls <code>supabase.auth.signUp()</code> with <code>emailRedirectTo</code> pointing to <code>/login?confirmed=1</code>. A profile row is created in the <code>users</code> table via the <code>createUserProfile()</code> server action.</li>
+  <li><strong>Email Confirmation:</strong> Supabase sends a confirmation email. User clicks the link to verify their account.</li>
+  <li><strong>Login</strong> (<code>app/login/page.tsx</code>): Client calls <code>supabase.auth.signInWithPassword()</code>. On success, the <code>getCurrentUser()</code> server action fetches the user profile from the database.</li>
+  <li><strong>Session Management:</strong> Supabase stores auth tokens in HTTP-only cookies via <code>@supabase/ssr</code>. Server Components read these cookies using <code>createAuthClient()</code> in <code>lib/supabase-server.ts</code>.</li>
+  <li><strong>Password Reset:</strong> <code>forgot-password</code> page sends a reset email via <code>supabase.auth.resetPasswordForEmail()</code>. The <code>reset-password</code> page listens for the <code>PASSWORD_RECOVERY</code> auth event and allows updating the password.</li>
+</ol>
+
+<h2>6.2 Authorization Layers</h2>
+<table>
+  <tr><th>Function</th><th>Location</th><th>Purpose</th></tr>
+  <tr><td><code>getCurrentUser()</code></td><td><code>lib/auth.ts</code></td><td>Returns the current user or <code>null</code>. Gracefully handles stale sessions.</td></tr>
+  <tr><td><code>requireAuth()</code></td><td><code>lib/auth.ts</code></td><td>Throws <code>Unauthorized</code> if no user is logged in.</td></tr>
+  <tr><td><code>requireAdmin()</code></td><td><code>lib/auth.ts</code></td><td>Throws <code>Forbidden</code> if user is not an admin.</td></tr>
+  <tr><td><code>requireUploaderOrAdmin()</code></td><td><code>lib/auth.ts</code></td><td>Allows access only to the project uploader or an admin.</td></tr>
+</table>
+
+<h2>6.3 Admin Secret Code</h2>
+<p>Admin registration requires a secret code validated server-side by <code>verifyAdminSecretCode()</code>. This prevents self-elevation - the <code>role</code> field is never read from <code>user_metadata</code> (which is client-settable).</p>
+
+<h2>6.4 Row Level Security</h2>
+<p>All five tables have RLS enabled. Key policies:</p>
+<ul>
+  <li><strong>Users:</strong> Can read own profile; admins read all. Users update own profile but cannot change their role.</li>
+  <li><strong>Projects:</strong> Anyone reads approved projects; uploaders/admins see pending/rejected.</li>
+  <li><strong>Bookmarks:</strong> Users manage only their own bookmarks.</li>
+  <li><strong>Notifications:</strong> Users read/update only their own notifications.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- ==================== 7. SCREENS ==================== -->
+<h1 id="screens">7. Screens &amp; Pages</h1>
+
+<!-- 7a -->
+<h2>7a. Landing / Home Page</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/page.tsx</code> (Server Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>The main entry point of the application. Shows a hero section with statistics (total projects, departments, downloads), a search bar for logged-in users, or a sign-up prompt for guests. Features sections for "In the Archive" (featured projects), "Browse by Department" (clickable department cards with project counts), "Recently Uploaded" projects, a "Start Contributing" CTA, and "How the archive works" info cards.</td></tr>
+  <tr><td><strong>Guest View</strong></td><td>Shows locked/blurred project cards (<code>LockedProjectCard</code>) encouraging registration. Search is not available.</td></tr>
+  <tr><td><strong>Logged-in View</strong></td><td>Full search bar, project listings, department browsing, quick-access links to Dashboard, Search, Upload, Profile.</td></tr>
+  <tr><td><strong>Key Data</strong></td><td>Calls <code>getRepositoryStats()</code>, <code>getApprovedProjects()</code> for recent and popular projects.</td></tr>
+</table>
+
+<!-- 7b -->
+<h2>7b. Registration Page</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/register/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/register</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Split-screen layout with a promotional panel on the left and the registration form on the right. Supports Student and Admin role toggle. Collects: full name, email, student index number, department (120+ departments from dropdown), programme, level/year, contact number (10-digit validation), password (min 6 chars), confirm password. Admin registration requires a secret code field.</td></tr>
+  <tr><td><strong>Validation</strong></td><td>Client-side validation for password match, length, required fields, 10-digit phone. Server-side duplicate email check via <code>checkEmailExists()</code>. Supabase also checks for existing identities.</td></tr>
+  <tr><td><strong>Post-Submit</strong></td><td>Shows "Check your email" confirmation with a link back to login.</td></tr>
+</table>
+
+<!-- 7c -->
+<h2>7c. Login Page</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/login/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/login</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Centered card with Student/Admin toggle tabs. Email + password fields with show/hide toggle. Admin login requires an additional "Admin Secret Code" field. Shows green banners for "Account created successfully" (after registration) and "Email confirmed" (after email verification). Includes "Forgot Password?" link and "Remember this device" checkbox. Redirects to <code>/admin</code> for admins, <code>/dashboard</code> for students (or returnUrl).</td></tr>
+</table>
+
+<!-- 7d -->
+<h2>7d. Forgot Password</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/forgot-password/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/forgot-password</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Simple email input form. Calls <code>supabase.auth.resetPasswordForEmail()</code> with <code>redirectTo</code> set to <code>{origin}/reset-password</code>. Shows success/error messages.</td></tr>
+</table>
+
+<!-- 7e -->
+<h2>7e. Reset Password</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/reset-password/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/reset-password</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Activated from the email reset link. Listens for Supabase <code>PASSWORD_RECOVERY</code> auth event. Shows "Verifying your reset link..." while waiting. Once verified, shows new password + confirm password form. Calls <code>supabase.auth.updateUser({ password })</code>. Auto-redirects to login after success. 15-second timeout for invalid/expired links.</td></tr>
+</table>
+
+<!-- 7f -->
+<h2>7f. Student Dashboard</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/dashboard/page.tsx</code> (Server Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/dashboard</code></td></tr>
+  <tr><td><strong>Layout</strong></td><td><code>app/dashboard/layout.tsx</code> - includes <code>DashboardSidebar</code> with navigation links</td></tr>
+  <tr><td><strong>Description</strong></td><td>Welcome message with user's name. Four stat cards: <strong>Repository Total</strong> (with "+X this week"), <strong>My Uploads</strong> (with pending count), <strong>Bookmarks</strong>, <strong>Recent Downloads</strong>. <strong>Recent Activity</strong> timeline showing last 3 uploads. <strong>Notifications</strong> panel with unread count badge. "My Uploads" table with title, department, year, status badges, downloads, views. CTA for searching projects. "Pro Tip" box about keywords.</td></tr>
+  <tr><td><strong>Key Data</strong></td><td>Calls <code>getMyProjects()</code>, <code>getStudentStats()</code>, <code>getMyNotifications()</code>, <code>getRepositoryStats()</code> in parallel via <code>Promise.all()</code>.</td></tr>
+</table>
+
+<!-- 7g -->
+<h2>7g. Upload Project</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/dashboard/upload/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/dashboard/upload</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Form with fields: Title, Author Name, Department (searchable datalist with 120+ options), Academic Year, Project Type (dropdown: Research Paper, Software/App, Website, Design/Art, Other), Abstract (textarea), Keywords (comma-separated). <strong>Artifacts section:</strong> GitHub URL, Live/External URL, PDF upload (max 50MB), ZIP upload (max 50MB), Images (up to 5 images, max 10MB each, JPEG/PNG/WEBP/GIF). At least one artifact is required. Validates file types and sizes. Submits as <code>FormData</code> to <code>uploadProject()</code> server action. Projects start as "Pending" and admins are notified.</td></tr>
+</table>
+
+<!-- 7h -->
+<h2>7h. Upload History</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/dashboard/history/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/dashboard/history</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Table of all user's uploads with columns: Title (clickable link), Department, Year, Status (badge), Uploaded date, Downloads, Views. Includes search-by-title and status filter (All/Pending/Approved/Rejected). "Submit New Project" button.</td></tr>
+</table>
+
+<!-- 7i -->
+<h2>7i. Bookmarks</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/dashboard/bookmarks/page.tsx</code> (Server Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/dashboard/bookmarks</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Grid of bookmarked projects displayed as <code>ProjectCard</code> components. Each card has an "unbookmark" button overlay. Empty state with "Browse projects" link.</td></tr>
+</table>
+
+<!-- 7j -->
+<h2>7j. Profile Settings</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/dashboard/profile/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/dashboard/profile</code></td></tr>
+  <tr><td><strong>Description</strong></td><td><strong>Profile Photo</strong> section with avatar upload (camera icon overlay, JPEG/PNG/WEBP, max 5MB). Shows initials if no avatar. <strong>Personal Information</strong> form: Full Name, Email (read-only), Department, Contact (10-digit validation). <strong>Academic Credentials</strong> section: Index Number, Programme (dropdown), Level/Year (dropdown). Save button calls <code>updateProfile()</code> server action.</td></tr>
+</table>
+
+<!-- 7k -->
+<h2>7k. Projects Search / Browse</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/projects/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/projects</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Two-column layout: <strong>Filter sidebar</strong> (hidden on mobile, toggle button) with Quick Search input, Department radio buttons (6 main + "Other" with searchable datalist of 120+ departments), Project Type radio buttons, Academic Year slider, Popular Keywords chips (Blockchain, AI, ML, Cloud, Cybersecurity, IoT), Clear All button. <strong>Results area</strong> showing project count, sort dropdown (Newest/Most Downloaded/Department), list of <code>ProjectListItem</code> cards with year badge, department, keywords, title, author, abstract, download/view counts, "View Details" and "Download PDF" buttons. Search is debounced (350ms) and filters reflect in URL params.</td></tr>
+</table>
+
+<!-- 7l -->
+<h2>7l. Project Detail</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/projects/[id]/page.tsx</code> (Server) + <code>components/ProjectDetailClient.tsx</code> (Client)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/projects/[id]</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Full project detail view with: title, author, department, academic year, status badge, artifact badges (PDF/ZIP/GitHub/Live URL/Images), abstract, keywords, download/view/helpful counts. Action buttons: Download PDF, Download ZIP (if available), View on GitHub (opens <code>GitHubRepoViewer</code>), Visit Live URL, Bookmark toggle, "Mark as Helpful" toggle. Image gallery with signed URLs. Related projects section (up to 3 from same department). Records views (deduplicated by cookie).</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- Admin screens -->
+<h2>7m. Admin Dashboard</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/admin/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/admin</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Three stat cards: Total Projects, Registered Users, Total Downloads. <strong>Pending Review Queue</strong> listing pending projects with title, author, department, year, abstract, status badge, artifact badges. Each item has View, Approve (green), Reject (red) action buttons. Empty state for no pending projects.</td></tr>
+</table>
+
+<h2>7n. Admin Projects Management</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/admin/projects/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/admin/projects</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Full table of all projects (any status). Status filter dropdown (All/Pending/Approved/Rejected). Columns: Title (clickable), Artifacts, Author, Department, Year, Status badge. Actions per row: View, Approve (if not approved), Reject (if not rejected), Delete (with confirmation dialog). Calls <code>getAllProjects()</code>, <code>approveOrRejectProject()</code>, <code>deleteProject()</code>.</td></tr>
+</table>
+
+<h2>7o. Admin Users Management</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/admin/users/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/admin/users</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Searchable user table (debounced 300ms, searches name, email, department). Columns: Name, Email, Department, Role (badge with icon), Status (Active/Deactivated badge), Joined date, Actions. Deactivate button with confirmation dialog. Calls <code>listUsers()</code>, <code>deactivateUser()</code>.</td></tr>
+</table>
+
+<h2>7p. Admin Statistics</h2>
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>File</strong></td><td><code>app/admin/statistics/page.tsx</code> (Client Component)</td></tr>
+  <tr><td><strong>URL</strong></td><td><code>/admin/statistics</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Four stat cards: Total Projects, Total Users, Total Downloads, Avg Downloads per project. Two Recharts bar charts: <strong>"Uploads per Month"</strong> (vertical bars by month) and <strong>"Top Departments"</strong> (horizontal bars by department name). Calls <code>getProjectStats()</code>.</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- ==================== 8. COMMUNICATION ==================== -->
+<h1 id="communication">8. Communication &amp; Data Flow</h1>
+
+<h2>8.1 Client-to-Server Communication</h2>
+<table>
+  <tr><th>Method</th><th>How It Works</th><th>Example</th></tr>
+  <tr>
+    <td><strong>Server Components</strong></td>
+    <td>Pages marked without <code>'use client'</code> run on the server. They call async functions directly (no API calls needed).</td>
+    <td><code>app/page.tsx</code> calls <code>getApprovedProjects()</code> and <code>getRepositoryStats()</code> directly during render.</td>
+  </tr>
+  <tr>
+    <td><strong>Server Actions</strong></td>
+    <td>Functions marked <code>'use server'</code> in <code>lib/actions/</code>. Client Components import and call them as regular async functions. Next.js handles the HTTP serialization.</td>
+    <td><code>uploadProject(formData)</code> is called from the upload form. <code>approveOrRejectProject(id, status)</code> is called from admin buttons.</td>
+  </tr>
+  <tr>
+    <td><strong>API Routes</strong></td>
+    <td>RESTful endpoints in <code>app/api/</code>. Used where browser redirects or direct HTTP responses are needed.</td>
+    <td><code>GET /api/download/[id]?type=pdf</code> generates a signed URL and 302-redirects the browser.</td>
+  </tr>
+  <tr>
+    <td><strong>Client-Side Supabase</strong></td>
+    <td>Auth operations (signUp, signIn, signOut, resetPassword) use the browser Supabase client directly.</td>
+    <td><code>supabase.auth.signInWithPassword({ email, password })</code></td>
+  </tr>
+</table>
+
+<h2>8.2 Server-to-Supabase Communication</h2>
+<p>Two Supabase clients are used on the server (<code>lib/supabase-server.ts</code>):</p>
+<table>
+  <tr><th>Client</th><th>Purpose</th><th>Key</th></tr>
+  <tr>
+    <td><code>supabaseAdmin</code></td>
+    <td>Service-role client for all database reads/writes. Bypasses Row Level Security.</td>
+    <td><code>SUPABASE_SERVICE_ROLE_KEY</code></td>
+  </tr>
+  <tr>
+    <td><code>createAuthClient()</code></td>
+    <td>Per-request client that reads the user's auth cookie. Used to identify who is logged in.</td>
+    <td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td>
+  </tr>
+</table>
+
+<h2>8.3 Key Data Flow: Project Upload</h2>
+<ol>
+  <li>Student fills upload form (Client Component)</li>
+  <li>Form submits <code>FormData</code> to <code>uploadProject()</code> Server Action</li>
+  <li>Server Action validates fields and file sizes/types</li>
+  <li>Files (PDF, ZIP, images) uploaded to Supabase Storage bucket <code>"projects"</code></li>
+  <li>Project record inserted into <code>projects</code> table with status <code>"Pending"</code></li>
+  <li>Notification created for all admin users via <code>createNotification()</code></li>
+  <li>Student redirected to dashboard</li>
+</ol>
+
+<h2>8.4 Key Data Flow: Project Download</h2>
+<ol>
+  <li>User clicks "Download PDF" link, which points to <code>/api/download/[id]?type=pdf</code></li>
+  <li>API route verifies authentication and authorization</li>
+  <li>Generates a 1-hour signed URL from Supabase Storage</li>
+  <li>Records the download in the <code>downloads</code> table and increments <code>downloadCount</code></li>
+  <li>302-redirects the browser to the signed URL for direct file download</li>
+</ol>
+
+<div class="page-break"></div>
+
+<!-- ==================== 9. NOTIFICATIONS ==================== -->
+<h1 id="notifications">9. Notification System</h1>
+<p><strong>Code Location:</strong> <code>lib/actions/notifications.ts</code>, <code>components/NotificationBell.tsx</code></p>
+
+<h2>Notification Triggers</h2>
+<table>
+  <tr><th>Event</th><th>Recipients</th><th>Message</th></tr>
+  <tr><td>New project uploaded</td><td>All admin users</td><td>"New project pending review: {title}"</td></tr>
+  <tr><td>Project approved</td><td>The uploader</td><td>"Your project '{title}' has been approved"</td></tr>
+  <tr><td>Project rejected</td><td>The uploader</td><td>"Your project '{title}' has been rejected"</td></tr>
+</table>
+
+<h2>Notification Bell Component</h2>
+<p>The <code>NotificationBell</code> component in the header shows a red badge with the count of unread notifications. Clicking it opens a dropdown with recent notifications. The "Mark all read" button calls <code>markAllNotificationsRead()</code>.</p>
+
+<!-- ==================== 10. FILE STORAGE ==================== -->
+<h1 id="file-storage">10. File Storage &amp; Downloads</h1>
+
+<h2>Storage Architecture</h2>
+<ul>
+  <li><strong>Bucket:</strong> <code>"projects"</code> (private, created via <code>schema.sql</code>)</li>
+  <li><strong>File Paths:</strong>
+    <ul>
+      <li>PDFs: <code>projects/{projectId}/document.pdf</code></li>
+      <li>ZIPs: <code>projects/{projectId}/source.zip</code></li>
+      <li>Images: <code>projects/{projectId}/images/0.jpg</code>, <code>1.png</code>, etc.</li>
+    </ul>
+  </li>
+  <li><strong>Avatar Bucket:</strong> <code>"avatars"</code> (separate bucket for profile photos)</li>
+  <li><strong>Access Control:</strong> All files are uploaded and served via the service-role key. Signed URLs (1-hour expiry) are generated for downloads and image display.</li>
+  <li><strong>Size Limits:</strong> PDF/ZIP: 50MB, Images: 10MB each (max 5), Avatars: 5MB</li>
+</ul>
+
+<h2>Download API</h2>
+<p><strong>Endpoint:</strong> <code>GET /api/download/[id]?type=pdf|zip</code> (<code>app/api/download/[id]/route.ts</code>)</p>
+<p>Supports a <code>?preview</code> query param for in-browser PDF viewing (no download header, no download count recorded).</p>
+
+<!-- ==================== 11. PWA ==================== -->
+<h1 id="pwa">11. PWA (Progressive Web App)</h1>
+
+<h2>Configuration</h2>
+<table>
+  <tr><th>File</th><th>Purpose</th></tr>
+  <tr><td><code>public/manifest.json</code></td><td>PWA manifest with app name, icons, theme color, start URL, display mode</td></tr>
+  <tr><td><code>public/sw.js</code></td><td>Service worker for caching and offline support</td></tr>
+  <tr><td><code>public/icons/icon-512x512.png</code></td><td>Full-bleed 512x512 icon (maskable)</td></tr>
+  <tr><td><code>public/icons/icon-192x192.png</code></td><td>Full-bleed 192x192 icon</td></tr>
+  <tr><td><code>components/PWAProvider.tsx</code></td><td>Client component that registers the service worker on mount</td></tr>
+  <tr><td><code>app/layout.tsx</code></td><td>Includes manifest link and Apple Web App meta tags in metadata</td></tr>
+</table>
+
+<h2>Installation</h2>
+<p>Users can install the app from Chrome (desktop or mobile) via the address bar install icon or "Add to Home Screen" on mobile. The Vercel deployment uses HTTPS, enabling seamless PWA installation.</p>
+
+<div class="page-break"></div>
+
+<!-- ==================== 12. SECURITY ==================== -->
+<h1 id="security">12. Security Measures</h1>
+
+<table>
+  <tr><th>Measure</th><th>Implementation</th></tr>
+  <tr>
+    <td><strong>Authentication</strong></td>
+    <td>Supabase Auth with email/password. Sessions stored in HTTP-only cookies. Automatic token refresh via <code>@supabase/ssr</code>.</td>
+  </tr>
+  <tr>
+    <td><strong>Admin Protection</strong></td>
+    <td>Admin role requires a server-validated secret code. Role is never read from client-settable <code>user_metadata</code> to prevent privilege escalation.</td>
+  </tr>
+  <tr>
+    <td><strong>Row Level Security</strong></td>
+    <td>All 5 database tables have RLS policies. Even if someone bypasses the app, direct database access is restricted.</td>
+  </tr>
+  <tr>
+    <td><strong>Service Role Isolation</strong></td>
+    <td>The service-role key (<code>SUPABASE_SERVICE_ROLE_KEY</code>) is only used server-side. The browser only has access to the anon key.</td>
+  </tr>
+  <tr>
+    <td><strong>File Access Control</strong></td>
+    <td>Storage bucket is private. Files are only accessible via time-limited signed URLs generated server-side after authorization checks.</td>
+  </tr>
+  <tr>
+    <td><strong>Input Validation</strong></td>
+    <td>Both client-side and server-side validation for all forms. File type checking, size limits, required field enforcement.</td>
+  </tr>
+  <tr>
+    <td><strong>CSRF Protection</strong></td>
+    <td>Next.js Server Actions include built-in CSRF protection via origin verification.</td>
+  </tr>
+  <tr>
+    <td><strong>Environment Variables</strong></td>
+    <td>Secrets stored in <code>.env.local</code> (gitignored). Only <code>NEXT_PUBLIC_*</code> vars are exposed to the browser.</td>
+  </tr>
+</table>
+
+<!-- ==================== 13. DEPLOYMENT ==================== -->
+<h1 id="deployment">13. Deployment</h1>
+
+<table>
+  <tr><th>Property</th><th>Detail</th></tr>
+  <tr><td><strong>Platform</strong></td><td>Vercel (serverless)</td></tr>
+  <tr><td><strong>Live URL</strong></td><td><code>https://miniproject-one-steel.vercel.app/</code></td></tr>
+  <tr><td><strong>Build Command</strong></td><td><code>next build</code></td></tr>
+  <tr><td><strong>Dev Command</strong></td><td><code>next dev</code></td></tr>
+  <tr><td><strong>Node.js</strong></td><td>20.x</td></tr>
+  <tr><td><strong>Environment Variables</strong></td><td>Set in Vercel dashboard: <code>NEXT_PUBLIC_SUPABASE_URL</code>, <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code>, <code>ADMIN_SECRET_CODE</code></td></tr>
+</table>
+
+<h2>Supabase Configuration</h2>
+<ul>
+  <li><strong>Site URL:</strong> <code>https://miniproject-one-steel.vercel.app/</code></li>
+  <li><strong>Redirect URLs:</strong> Include both the Vercel URL and <code>http://localhost:3000</code> for local development</li>
+  <li><strong>Email Templates:</strong> Confirmation and password reset emails configured in Supabase dashboard</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- ==================== 14. SHARED COMPONENTS ==================== -->
+<h1 id="components">14. Shared Components</h1>
+
+<table>
+  <tr><th>Component</th><th>File</th><th>Description</th></tr>
+  <tr>
+    <td><code>Header</code></td>
+    <td><code>components/Header.tsx</code></td>
+    <td>Global sticky navigation bar. Logo + app name, navigation links (Home, Browse Projects, Departments, About), search input, notification bell, dark/light theme toggle, "New Project" link, user profile dropdown (with avatar, info, dashboard/profile/logout links), mobile hamburger menu.</td>
+  </tr>
+  <tr>
+    <td><code>DashboardSidebar</code></td>
+    <td><code>components/DashboardSidebar.tsx</code></td>
+    <td>Side navigation for both student and admin dashboards. Shows role-appropriate links with active state highlighting. Student links: Dashboard, My Uploads, Bookmarks, Profile. Admin links: Dashboard, All Projects, Users, Statistics.</td>
+  </tr>
+  <tr>
+    <td><code>AuthProvider</code></td>
+    <td><code>components/AuthProvider.tsx</code></td>
+    <td>React Context provider for user authentication state. Provides <code>user</code>, <code>setUser</code>, and <code>logout</code> across all components. Hydrated from server-side <code>getCurrentUser()</code> on initial load.</td>
+  </tr>
+  <tr>
+    <td><code>ThemeProvider</code></td>
+    <td><code>components/ThemeProvider.tsx</code></td>
+    <td>React Context for dark/light theme management. Persists preference in a cookie. Toggles <code>dark</code> class on <code>&lt;html&gt;</code>.</td>
+  </tr>
+  <tr>
+    <td><code>ProjectCard</code></td>
+    <td><code>components/ProjectCard.tsx</code></td>
+    <td>Card component for grid display of projects. Shows title, author, department, year, abstract (truncated), keyword badges, download/view/helpful counts, artifact badges.</td>
+  </tr>
+  <tr>
+    <td><code>ProjectDetailClient</code></td>
+    <td><code>components/ProjectDetailClient.tsx</code></td>
+    <td>Full project detail view with all metadata, download buttons, bookmark/helpful toggles, GitHub repo viewer, image gallery, related projects section.</td>
+  </tr>
+  <tr>
+    <td><code>ProjectStatusBadge</code></td>
+    <td><code>components/ProjectStatusBadge.tsx</code></td>
+    <td>Colored badge component: green for Approved, yellow for Pending, red for Rejected.</td>
+  </tr>
+  <tr>
+    <td><code>ProjectArtifactBadges</code></td>
+    <td><code>components/ProjectArtifactBadges.tsx</code></td>
+    <td>Shows which artifacts a project has: PDF, ZIP, GitHub, Live URL, Images - as small icon badges.</td>
+  </tr>
+  <tr>
+    <td><code>NotificationBell</code></td>
+    <td><code>components/NotificationBell.tsx</code></td>
+    <td>Bell icon in the header with unread count badge and dropdown notification list.</td>
+  </tr>
+  <tr>
+    <td><code>GitHubRepoViewer</code></td>
+    <td><code>components/GitHubRepoViewer.tsx</code></td>
+    <td>Fetches and displays the file tree of a GitHub repository using the GitHub API.</td>
+  </tr>
+  <tr>
+    <td><code>LockedProjectCard</code></td>
+    <td><code>components/LockedProjectCard.tsx</code></td>
+    <td>Blurred placeholder card shown to guests, encouraging them to create an account.</td>
+  </tr>
+  <tr>
+    <td><code>PWAProvider</code></td>
+    <td><code>components/PWAProvider.tsx</code></td>
+    <td>Registers the service worker on component mount for PWA support.</td>
+  </tr>
+</table>
+
+<div class="page-break"></div>
+
+<h1>15. Summary of Key Files</h1>
+<p>Quick reference for locating important code:</p>
+
+<table>
+  <tr><th>Category</th><th>Files</th></tr>
+  <tr>
+    <td><strong>Authentication Logic</strong></td>
+    <td><code>lib/auth.ts</code>, <code>lib/actions/auth.ts</code>, <code>lib/supabase-server.ts</code>, <code>lib/supabase-client.ts</code></td>
+  </tr>
+  <tr>
+    <td><strong>Project CRUD</strong></td>
+    <td><code>lib/actions/projects.ts</code> (upload, search, approve, delete, bookmarks, downloads, stats)</td>
+  </tr>
+  <tr>
+    <td><strong>Notifications</strong></td>
+    <td><code>lib/actions/notifications.ts</code>, <code>components/NotificationBell.tsx</code></td>
+  </tr>
+  <tr>
+    <td><strong>Type Definitions</strong></td>
+    <td><code>lib/types.ts</code> (User, Project, Download, Bookmark, Notification)</td>
+  </tr>
+  <tr>
+    <td><strong>Constants</strong></td>
+    <td><code>lib/constants.ts</code> (120+ departments, programmes, levels, keywords, project types)</td>
+  </tr>
+  <tr>
+    <td><strong>Database Schema</strong></td>
+    <td><code>supabase/schema.sql</code>, <code>supabase/atomic_counters.sql</code>, <code>supabase/project_types_and_media.sql</code></td>
+  </tr>
+  <tr>
+    <td><strong>File Downloads</strong></td>
+    <td><code>app/api/download/[id]/route.ts</code></td>
+  </tr>
+  <tr>
+    <td><strong>Global Layout</strong></td>
+    <td><code>app/layout.tsx</code> (root), <code>app/dashboard/layout.tsx</code> (student), <code>app/admin/layout.tsx</code> (admin)</td>
+  </tr>
+  <tr>
+    <td><strong>Navigation</strong></td>
+    <td><code>components/Header.tsx</code>, <code>components/DashboardSidebar.tsx</code></td>
+  </tr>
+  <tr>
+    <td><strong>Styling</strong></td>
+    <td><code>app/globals.css</code> (Tailwind imports + custom animations: fade-in, marquee, float)</td>
+  </tr>
+  <tr>
+    <td><strong>PWA</strong></td>
+    <td><code>public/manifest.json</code>, <code>public/sw.js</code>, <code>components/PWAProvider.tsx</code></td>
+  </tr>
+  <tr>
+    <td><strong>Configuration</strong></td>
+    <td><code>package.json</code>, <code>next.config.ts</code>, <code>tsconfig.json</code>, <code>.env.local</code></td>
+  </tr>
+</table>
+
+<div style="margin-top:40px;padding:20px;border-top:2px solid #2563eb;text-align:center;color:#64748b;font-size:10pt;">
+  <strong>Students Academic Repository</strong> &mdash; Site Documentation<br>
+  Generated September 2026 &middot; Next.js 16 &middot; React 19 &middot; Supabase &middot; Tailwind CSS 4 &middot; Vercel
+</div>
+
+</body>
+</html>

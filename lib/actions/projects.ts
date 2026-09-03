@@ -230,97 +230,130 @@ export async function getStudentStats() {
   return { totalUploads, totalDownloads, totalBookmarks, pendingApprovals, uploadsThisWeek }
 }
 
-export async function uploadProject(formData: FormData) {
-  const user = await requireAuth()
-  if (user.role !== 'student' && user.role !== 'admin') {
-    throw new Error('Only students and admins can upload projects')
-  }
+type ProjectUploadMetadata = {
+  title: string
+  authorName: string
+  department: string
+  academicYear: string
+  abstract: string
+  projectType: string
+  githubUrl?: string
+  liveUrl?: string
+  keywords: string
+}
 
-  const title = String(formData.get('title') || '').trim()
-  const authorName = String(formData.get('authorName') || '').trim()
-  const department = String(formData.get('department') || '').trim()
-  const academicYear = String(formData.get('academicYear') || '').trim()
-  const abstract = String(formData.get('abstract') || '').trim()
-  const projectType = String(formData.get('projectType') || '').trim()
-  const githubUrl = String(formData.get('githubUrl') || '').trim() || undefined
-  const liveUrl = String(formData.get('liveUrl') || '').trim() || undefined
-  const keywordsRaw = String(formData.get('keywords') || '')
-    .split(',')
-    .map((k) => k.trim())
-    .filter(Boolean)
-  const pdfFile = formData.get('pdf') as File | null
-  const zipFile = formData.get('zip') as File | null
-  const imageFiles = formData.getAll('images').filter((f): f is File => f instanceof File && f.size > 0)
+type UploadFileDescriptor = {
+  kind: 'pdf' | 'zip' | 'image'
+  name: string
+  size: number
+  type: string
+}
 
-  if (!title || !authorName || !department || !academicYear || !abstract || !projectType || !keywordsRaw.length) {
+type PreparedUpload = UploadFileDescriptor & { path: string; token: string }
+
+function validateUpload(metadata: ProjectUploadMetadata, files: UploadFileDescriptor[]) {
+  const title = String(metadata.title || '').trim()
+  const authorName = String(metadata.authorName || '').trim()
+  const department = String(metadata.department || '').trim()
+  const academicYear = String(metadata.academicYear || '').trim()
+  const abstract = String(metadata.abstract || '').trim()
+  const projectType = String(metadata.projectType || '').trim()
+  const githubUrl = String(metadata.githubUrl || '').trim() || undefined
+  const liveUrl = String(metadata.liveUrl || '').trim() || undefined
+  const keywords = String(metadata.keywords || '').split(',').map((keyword) => keyword.trim()).filter(Boolean)
+
+  if (!title || !authorName || !department || !academicYear || !abstract || !projectType || !keywords.length) {
     throw new Error('Please fill in all required fields')
   }
 
-  const hasPdf = !!pdfFile && pdfFile.size > 0
-  const hasZip = !!zipFile && zipFile.size > 0
-  if (!hasPdf && !hasZip && !githubUrl && !liveUrl && imageFiles.length === 0) {
+  const pdfs = files.filter((file) => file.kind === 'pdf')
+  const zips = files.filter((file) => file.kind === 'zip')
+  const images = files.filter((file) => file.kind === 'image')
+  if (pdfs.length > 1 || zips.length > 1) throw new Error('Only one PDF and one ZIP file may be uploaded')
+  if (!pdfs.length && !zips.length && !githubUrl && !liveUrl && !images.length) {
     throw new Error('Please provide at least one of: PDF, GitHub link, live/external link, or images')
   }
 
-  if (hasPdf && pdfFile!.size > MAX_FILE_SIZE) throw new Error('PDF file exceeds 50MB limit')
-  if (hasZip && zipFile!.size > MAX_FILE_SIZE) throw new Error('ZIP file exceeds 50MB limit')
-  if (hasPdf && pdfFile!.type !== 'application/pdf' && !pdfFile!.name.endsWith('.pdf')) {
-    throw new Error('Only PDF files are allowed for the document')
+  for (const file of files) {
+    if (!Number.isSafeInteger(file.size) || file.size <= 0) throw new Error('Selected files must not be empty')
+    const lowerName = String(file.name || '').toLowerCase()
+    if (file.kind === 'pdf' && (file.size > MAX_FILE_SIZE || (file.type !== 'application/pdf' && !lowerName.endsWith('.pdf')))) {
+      throw new Error(file.size > MAX_FILE_SIZE ? 'PDF file exceeds 50MB limit' : 'Only PDF files are allowed for the document')
+    }
+    if (file.kind === 'zip' && (file.size > MAX_FILE_SIZE || !lowerName.endsWith('.zip'))) {
+      throw new Error(file.size > MAX_FILE_SIZE ? 'ZIP file exceeds 50MB limit' : 'Only ZIP files are allowed for source code')
+    }
   }
-  if (hasZip && !zipFile!.name.endsWith('.zip')) throw new Error('Only ZIP files are allowed for source code')
+  if (images.length > MAX_IMAGES) throw new Error(`You can upload at most ${MAX_IMAGES} images`)
+  for (const image of images) {
+    if (image.size > MAX_IMAGE_SIZE) throw new Error('Each image must be under 10MB')
+    if (!ALLOWED_IMAGE_TYPES.includes(image.type)) throw new Error('Images must be JPEG, PNG, WEBP, or GIF')
+  }
 
-  if (imageFiles.length > MAX_IMAGES) throw new Error(`You can upload at most ${MAX_IMAGES} images`)
-  for (const img of imageFiles) {
-    if (img.size > MAX_IMAGE_SIZE) throw new Error('Each image must be under 10MB')
-    if (!ALLOWED_IMAGE_TYPES.includes(img.type)) throw new Error('Images must be JPEG, PNG, WEBP, or GIF')
-  }
+  return { title, authorName, department, academicYear, abstract, projectType, githubUrl, liveUrl, keywords }
+}
+
+function uploadPaths(projectId: string, files: UploadFileDescriptor[]) {
+  let imageIndex = 0
+  return files.map((file) => {
+    if (file.kind === 'pdf') return `projects/${projectId}/document.pdf`
+    if (file.kind === 'zip') return `projects/${projectId}/source.zip`
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : file.type === 'image/gif' ? 'gif' : 'jpg'
+    return `projects/${projectId}/images/${imageIndex++}.${ext}`
+  })
+}
+
+async function requireUploadRole() {
+  const user = await requireAuth()
+  if (user.role !== 'student' && user.role !== 'admin') throw new Error('Only students and admins can upload projects')
+  return user
+}
+
+export async function prepareProjectUpload(metadata: ProjectUploadMetadata, files: UploadFileDescriptor[]) {
+  await requireUploadRole()
+  validateUpload(metadata, files)
 
   const projectId = newId()
+  const paths = uploadPaths(projectId, files)
+  const uploads = await Promise.all(files.map(async (file, index): Promise<PreparedUpload> => {
+    const path = paths[index]
+    const { data, error } = await supabaseAdmin.storage.from('projects').createSignedUploadUrl(path)
+    if (error || !data) throw new Error(`Could not prepare ${file.name}: ${error?.message || 'unknown storage error'}`)
+    return { ...file, path, token: data.token }
+  }))
 
-  async function uploadFile(file: File, path: string) {
-    const { error } = await supabaseAdmin.storage.from('projects').upload(path, file, {
-      contentType: file.type || 'application/octet-stream',
-    })
-    if (error) throw new Error(error.message)
-    return path
+  return { projectId, uploads }
+}
+
+export async function uploadProject(projectId: string, metadata: ProjectUploadMetadata, files: UploadFileDescriptor[]) {
+  const user = await requireUploadRole()
+  const values = validateUpload(metadata, files)
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(projectId)) {
+    throw new Error('Invalid upload session')
   }
 
-  let pdfPath: string | undefined
-  if (hasPdf) {
-    pdfPath = `projects/${projectId}/document.pdf`
-    await uploadFile(pdfFile!, pdfPath)
+  const paths = uploadPaths(projectId, files)
+  for (let index = 0; index < paths.length; index++) {
+    const path = paths[index]
+    const slash = path.lastIndexOf('/')
+    const { data, error } = await supabaseAdmin.storage.from('projects').list(path.slice(0, slash), { search: path.slice(slash + 1), limit: 2 })
+    const object = data?.find((item) => item.name === path.slice(slash + 1))
+    if (error || !object) throw new Error(`Upload incomplete: ${files[index].name} was not received`)
+    const storedSize = Number(object.metadata?.size)
+    if (Number.isFinite(storedSize) && storedSize !== files[index].size) throw new Error(`Upload incomplete: ${files[index].name} has an unexpected size`)
   }
 
-  let zipPath: string | undefined
-  if (hasZip) {
-    zipPath = `projects/${projectId}/source.zip`
-    await uploadFile(zipFile!, zipPath)
-  }
-
-  const imagePaths: string[] = []
-  for (let i = 0; i < imageFiles.length; i++) {
-    const img = imageFiles[i]
-    const ext = img.type === 'image/png' ? 'png' : img.type === 'image/webp' ? 'webp' : img.type === 'image/gif' ? 'gif' : 'jpg'
-    const imgPath = `projects/${projectId}/images/${i}.${ext}`
-    await uploadFile(img, imgPath)
-    imagePaths.push(imgPath)
-  }
-
+  const pdfPath = files.findIndex((file) => file.kind === 'pdf')
+  const zipPath = files.findIndex((file) => file.kind === 'zip')
+  const imagePaths = paths.filter((_, index) => files[index].kind === 'image')
   const project: Project = {
     projectId,
-    title,
-    authorName,
-    department,
-    academicYear,
-    abstract,
-    keywords: keywordsRaw,
-    projectType: projectType as Project['projectType'],
-    pdfUrl: pdfPath ? downloadApiUrl(projectId, 'pdf') : undefined,
-    pdfPath,
-    githubUrl,
-    sourceCodeZipUrl: zipPath ? downloadApiUrl(projectId, 'zip') : undefined,
-    sourceCodeZipPath: zipPath,
-    liveUrl,
+    ...values,
+    projectType: values.projectType as Project['projectType'],
+    pdfUrl: pdfPath >= 0 ? downloadApiUrl(projectId, 'pdf') : undefined,
+    pdfPath: pdfPath >= 0 ? paths[pdfPath] : undefined,
+    sourceCodeZipUrl: zipPath >= 0 ? downloadApiUrl(projectId, 'zip') : undefined,
+    sourceCodeZipPath: zipPath >= 0 ? paths[zipPath] : undefined,
     images: imagePaths.length ? imagePaths : undefined,
     status: 'Pending',
     uploadDate: new Date().toISOString(),
@@ -332,13 +365,14 @@ export async function uploadProject(formData: FormData) {
   }
 
   const { error } = await supabaseAdmin.from('projects').insert(project)
-  if (error) throw new Error(error.message)
+  if (error) {
+    await supabaseAdmin.storage.from('projects').remove(paths)
+    throw new Error(`Could not finalize project: ${error.message}`)
+  }
 
   const { data: admins } = await supabaseAdmin.from('users').select('userId').eq('role', 'admin')
   if (admins) {
-    await Promise.all(
-      admins.map((admin) => createNotification((admin as User).userId, `New project pending review: ${title}`))
-    )
+    await Promise.all(admins.map((admin) => createNotification((admin as User).userId, `New project pending review: ${values.title}`)))
   }
 
   return { projectId }
