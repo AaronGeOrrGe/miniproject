@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Search, SlidersHorizontal, FileText, Download, Eye, Upload } from 'lucide-react'
 import { getMyProjects } from '@/lib/actions/projects'
 import { ProjectStatusBadge } from '@/components/ProjectStatusBadge'
+import { StudentDeleteProjectButton } from '@/components/StudentDeleteProjectButton'
 import type { Project, ProjectStatus } from '@/lib/types'
 
 export default function UploadHistoryPage() {
@@ -101,6 +102,7 @@ export default function UploadHistoryPage() {
                 <th className="px-6 py-3 font-medium text-slate-700 dark:text-slate-300">Uploaded</th>
                 <th className="px-6 py-3 font-medium text-slate-700 dark:text-slate-300">Downloads</th>
                 <th className="px-6 py-3 font-medium text-slate-700 dark:text-slate-300">Views</th>
+                <th className="px-6 py-3 font-medium text-slate-700 dark:text-slate-300">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
@@ -117,6 +119,15 @@ export default function UploadHistoryPage() {
                   <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{new Date(p.uploadDate).toLocaleDateString()}</td>
                   <td className="px-6 py-4 text-slate-600 dark:text-slate-400"><span className="flex items-center gap-1"><Download className="h-3.5 w-3.5" />{p.downloadCount || 0}</span></td>
                   <td className="px-6 py-4 text-slate-600 dark:text-slate-400"><span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{p.viewCount || 0}</span></td>
+                  <td className="px-6 py-4">
+                    {(p.status === 'Pending' || p.status === 'Rejected') && (
+                      <StudentDeleteProjectButton
+                        projectId={p.projectId}
+                        title={p.title}
+                        onDeleted={(projectId) => setProjects((current) => current.filter((project) => project.projectId !== projectId))}
+                      />
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

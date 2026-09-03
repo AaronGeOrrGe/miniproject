@@ -4,6 +4,7 @@ import { getMyProjects, getStudentStats, getRepositoryStats } from '@/lib/action
 import { getMyNotifications } from '@/lib/actions/notifications'
 import { getCurrentUser } from '@/lib/auth'
 import { ProjectStatusBadge } from '@/components/ProjectStatusBadge'
+import { StudentDeleteProjectButton } from '@/components/StudentDeleteProjectButton'
 
 export default async function DashboardPage() {
   const { user } = await getCurrentUser()
@@ -203,6 +204,7 @@ export default async function DashboardPage() {
                   <th className="px-6 py-3 font-medium text-slate-700 dark:text-slate-300">Status</th>
                   <th className="px-6 py-3 font-medium text-slate-700 dark:text-slate-300">Downloads</th>
                   <th className="px-6 py-3 font-medium text-slate-700 dark:text-slate-300">Views</th>
+                  <th className="px-6 py-3 font-medium text-slate-700 dark:text-slate-300">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
@@ -221,6 +223,11 @@ export default async function DashboardPage() {
                     </td>
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
                       <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{p.viewCount || 0}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {(p.status === 'Pending' || p.status === 'Rejected') && (
+                        <StudentDeleteProjectButton projectId={p.projectId} title={p.title} />
+                      )}
                     </td>
                   </tr>
                 ))}

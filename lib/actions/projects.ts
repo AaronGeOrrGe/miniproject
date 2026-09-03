@@ -417,17 +417,31 @@ export async function approveOrRejectProject(projectId: string, status: 'Approve
 }
 
 export async function deleteProject(projectId: string) {
-  await requireAdmin()
-  const project = await getProjectById(projectId)
-  if (project) {
-    const paths = [project.pdfPath, project.sourceCodeZipPath, ...(project.images || [])].filter(
-      (p): p is string => !!p
-    )
-    if (paths.length) await supabaseAdmin.storage.from('projects').remove(paths)
+  const user = await requireAuth()
+  const { data, error: projectError } = await supabaseAdmin
+    .from('projects')
+    .select('*')
+    .eq('projectId', projectId)
+    .single()
+
+  if (projectError || !data) throw new Error('Project not found')
+  const project = data as Project
+  const isUploader = project.uploaderId === user.userId
+  const studentCanDelete = isUploader && (project.status === 'Pending' || project.status === 'Rejected')
+  if (user.role !== 'admin' && !studentCanDelete) {
+    throw new Error(project.status === 'Approved' ? 'Approved projects can only be deleted by an administrator' : 'You cannot delete this project')
   }
-  await supabaseAdmin.from('downloads').delete().eq('projectId', projectId)
-  await supabaseAdmin.from('bookmarks').delete().eq('projectId', projectId)
-  await supabaseAdmin.from('projects').delete().eq('projectId', projectId)
+
+  const paths = [project.pdfPath, project.sourceCodeZipPath, ...(project.images || [])].filter(
+    (path): path is string => !!path
+  )
+  if (paths.length) {
+    const { error } = await supabaseAdmin.storage.from('projects').remove(paths)
+    if (error) throw new Error(`Could not delete project files: ${error.message}`)
+  }
+
+  const { error } = await supabaseAdmin.from('projects').delete().eq('projectId', projectId)
+  if (error) throw new Error(`Could not delete project: ${error.message}`)
 }
 
 export async function getRepositoryStats() {
