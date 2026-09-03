@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Bell } from 'lucide-react'
 import { getMyNotifications, markAllNotificationsRead } from '@/lib/actions/notifications'
 import type { Notification } from '@/lib/types'
@@ -11,21 +11,41 @@ export function NotificationBell() {
   const [loading, setLoading] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
+  const loadNotifications = useCallback(async (showLoading = false) => {
+    if (showLoading) setLoading(true)
+    try {
+      const latest = await getMyNotifications()
+      setNotifications(latest)
+      return latest
+    } catch {
+      return []
+    } finally {
+      if (showLoading) setLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
-    if (!open) return
-    setLoading(true)
-    getMyNotifications()
-      .then(setNotifications)
-      .finally(() => setLoading(false))
-  }, [open])
+    const initialLoad = window.setTimeout(loadNotifications, 0)
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === 'visible') loadNotifications()
+    }, 10000)
+    const refreshOnFocus = () => loadNotifications()
+    window.addEventListener('focus', refreshOnFocus)
+    return () => {
+      window.clearTimeout(initialLoad)
+      window.clearInterval(interval)
+      window.removeEventListener('focus', refreshOnFocus)
+    }
+  }, [loadNotifications])
 
   const unread = notifications.filter((n) => n.status === 'unread').length
 
   const handleOpen = async () => {
     setOpen(true)
-    if (unread > 0) {
+    const latest = await loadNotifications(true)
+    if (latest.some((notification) => notification.status === 'unread')) {
       await markAllNotificationsRead()
-      setNotifications((prev) => prev.map((n) => ({ ...n, status: 'read' as const })))
+      setNotifications((prev) => prev.map((notification) => ({ ...notification, status: 'read' as const })))
     }
   }
 
