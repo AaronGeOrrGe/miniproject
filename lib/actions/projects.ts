@@ -310,22 +310,26 @@ async function requireUploadRole() {
 }
 
 export async function prepareProjectUpload(metadata: ProjectUploadMetadata, files: UploadFileDescriptor[]) {
-  await requireUploadRole()
-  validateUpload(metadata, files)
+  try {
+    await requireUploadRole()
+    validateUpload(metadata, files)
 
-  const projectId = newId()
-  const paths = uploadPaths(projectId, files)
-  const uploads = await Promise.all(files.map(async (file, index): Promise<PreparedUpload> => {
-    const path = paths[index]
-    const { data, error } = await supabaseAdmin.storage.from('projects').createSignedUploadUrl(path)
-    if (error || !data) throw new Error(`Could not prepare ${file.name}: ${error?.message || 'unknown storage error'}`)
-    return { ...file, path, token: data.token }
-  }))
+    const projectId = newId()
+    const paths = uploadPaths(projectId, files)
+    const uploads = await Promise.all(files.map(async (file, index): Promise<PreparedUpload> => {
+      const path = paths[index]
+      const { data, error } = await supabaseAdmin.storage.from('projects').createSignedUploadUrl(path)
+      if (error || !data) throw new Error(`Could not prepare ${file.name}: ${error?.message || 'unknown storage error'}`)
+      return { ...file, path, token: data.token }
+    }))
 
-  return { projectId, uploads }
+    return { ok: true as const, projectId, uploads }
+  } catch (error) {
+    return { ok: false as const, error: error instanceof Error ? error.message : 'Could not prepare project upload' }
+  }
 }
 
-export async function uploadProject(projectId: string, metadata: ProjectUploadMetadata, files: UploadFileDescriptor[]) {
+async function finalizeProjectUpload(projectId: string, metadata: ProjectUploadMetadata, files: UploadFileDescriptor[]) {
   const user = await requireUploadRole()
   const values = validateUpload(metadata, files)
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(projectId)) {
@@ -372,10 +376,19 @@ export async function uploadProject(projectId: string, metadata: ProjectUploadMe
 
   const { data: admins } = await supabaseAdmin.from('users').select('userId').eq('role', 'admin')
   if (admins) {
-    await Promise.all(admins.map((admin) => createNotification((admin as User).userId, `New project pending review: ${values.title}`)))
+    await Promise.allSettled(admins.map((admin) => createNotification((admin as User).userId, `New project pending review: ${values.title}`)))
   }
 
   return { projectId }
+}
+
+export async function uploadProject(projectId: string, metadata: ProjectUploadMetadata, files: UploadFileDescriptor[]) {
+  try {
+    const project = await finalizeProjectUpload(projectId, metadata, files)
+    return { ok: true as const, ...project }
+  } catch (error) {
+    return { ok: false as const, error: error instanceof Error ? error.message : 'Could not finalize project upload' }
+  }
 }
 
 export async function getAllProjects(status?: 'Pending' | 'Approved' | 'Rejected') {

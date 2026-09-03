@@ -50,6 +50,7 @@ export default function UploadPage() {
       ]
       const descriptors = selectedFiles.map(({ kind, file }) => ({ kind, name: file.name, size: file.size, type: file.type }))
       const prepared = await prepareProjectUpload(metadata, descriptors)
+      if (!prepared.ok) throw new Error(prepared.error)
       const supabase = createClient()
 
       for (let index = 0; index < prepared.uploads.length; index++) {
@@ -61,7 +62,8 @@ export default function UploadPage() {
         if (uploadError) throw new Error(`Failed to upload ${file.name}: ${uploadError.message}. Please submit the form again.`)
       }
 
-      await uploadProject(prepared.projectId, metadata, descriptors)
+      const finalized = await uploadProject(prepared.projectId, metadata, descriptors)
+      if (!finalized.ok) throw new Error(finalized.error)
       router.push('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')
