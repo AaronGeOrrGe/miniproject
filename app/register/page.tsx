@@ -17,6 +17,7 @@ import {
 import { createUserProfile, verifyAdminSecretCode, deleteUnconfirmedAuthUser, checkEmailExists } from '@/lib/actions/auth'
 import { createClient } from '@/lib/supabase-client'
 import { ALL_DEPARTMENTS, PROGRAMMES, LEVELS } from '@/lib/constants'
+import { Noto_Sans_Indic_Siyaq_Numbers } from 'next/font/google'
 
 export default function RegisterPage({
   searchParams,
@@ -43,14 +44,59 @@ export default function RegisterPage({
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    const { name, value } = e.target
+    
+    // Real-time validation for specific fields
+    if (name === 'fullName') {
+      // Only allow letters, spaces, hyphens, and apostrophes
+      const isValid = /^[a-zA-Z\s\-']+$/.test(value)
+      if (value && !isValid) {
+        setFieldErrors(prev => ({ ...prev, fullName: 'Full name can only contain letters, spaces, hyphens, and apostrophes' }))
+      } else {
+        setFieldErrors(prev => ({ ...prev, fullName: '' }))
+      }
+    }
+    
+    if (name === 'indexNumber') {
+      // Validate 7-8 digits only
+      const isValid = /^\d{7,8}$/.test(value)
+      if (value && !isValid) {
+        setFieldErrors(prev => ({ ...prev, indexNumber: 'Index number must be 7-8 digits only' }))
+      } else {
+        setFieldErrors(prev => ({ ...prev, indexNumber: '' }))
+      }
+    }
+    
+    if (name === 'email') {
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (value && !emailRegex.test(value)) {
+        setFieldErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }))
+      } else {
+        setFieldErrors(prev => ({ ...prev, email: '' }))
+      }
+    }
+    
+    if (name === 'contact') {
+      // Validate 10-digit phone number
+      const isValid = /^\d{10}$/.test(value)
+      if (value && !isValid) {
+        setFieldErrors(prev => ({ ...prev, contact: 'Contact number must be exactly 10 digits' }))
+      } else {
+        setFieldErrors(prev => ({ ...prev, contact: '' }))
+      }
+    }
+    
+    setForm((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setFieldErrors({})
 
     if (form.password.length < 6) {
       setError('Password must be at least 6 characters')
@@ -66,6 +112,18 @@ export default function RegisterPage({
     }
     if (form.contact && !/^\d{10}$/.test(form.contact)) {
       setError('Contact number must be exactly 10 digits')
+      return
+    }
+    
+    // Validate full name - only letters, spaces, hyphens, and apostrophes
+    if (!/^[a-zA-Z\s\-']+$/.test(form.fullName)) {
+      setFieldErrors({ fullName: 'Full name can only contain letters, spaces, hyphens, and apostrophes' })
+      return
+    }
+    
+    // Validate index number for students
+    if (role === 'student' && form.indexNumber && !/^\d{7,8}$/.test(form.indexNumber)) {
+      setFieldErrors({ indexNumber: 'Index number must be 7-8 digits only' })
       return
     }
 
@@ -235,11 +293,16 @@ export default function RegisterPage({
                     type="text"
                     required
                     placeholder="Enter your full legal name"
-                    className={inputClass}
+                    pattern="[a-zA-Z\s\-']+"
+                    title="Full name can only contain letters, spaces, hyphens, and apostrophes"
+                    className={`${inputClass} ${fieldErrors.fullName ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                     value={form.fullName}
                     onChange={handleChange}
                   />
                 </div>
+                {fieldErrors.fullName && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.fullName}</p>
+                )}
               </div>
 
               <div className="relative">
@@ -254,11 +317,14 @@ export default function RegisterPage({
                     type="email"
                     required
                     placeholder="name@university.edu"
-                    className={inputClass}
+                    className={`${inputClass} ${fieldErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                     value={form.email}
                     onChange={handleChange}
                   />
                 </div>
+                {fieldErrors.email && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.email}</p>
+                )}
               </div>
             </div>
 
@@ -276,11 +342,18 @@ export default function RegisterPage({
                       id="indexNumber"
                       name="indexNumber"
                       type="text"
-                      placeholder="e.g. STU-2024-001"
-                      className={inputClass.replace('pl-10', 'pl-3')}
+                      inputMode="numeric"
+                      placeholder="e.g. 1234567 or 12345678"
+                      pattern="^\d{7,8}$"
+                      title="Index number must be 7-8 digits only"
+                      maxLength={8}
+                      className={`${inputClass.replace('pl-10', 'pl-3')} ${fieldErrors.indexNumber ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                       value={form.indexNumber}
                       onChange={handleChange}
                     />
+                    {fieldErrors.indexNumber && (
+                      <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.indexNumber}</p>
+                    )}
                   </div>
                 )}
 
@@ -372,11 +445,15 @@ export default function RegisterPage({
                 pattern="\d{10}"
                 maxLength={10}
                 placeholder="10-digit phone number"
-                className={inputClass.replace('pl-10', 'pl-3')}
+                className={`${inputClass.replace('pl-10', 'pl-3')} ${fieldErrors.contact ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                 value={form.contact}
                 onChange={handleChange}
               />
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">If provided, must be exactly 10 digits.</p>
+              {fieldErrors.contact ? (
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.contact}</p>
+              ) : (
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">If provided, must be exactly 10 digits.</p>
+              )}
             </div>
 
             {role === 'admin' && (
